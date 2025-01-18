@@ -1,0 +1,13 @@
+{
+  "Name": "Resource Viewer",
+  "IsCustom": true,
+  "Description": "Can view resources in a specific resource group",
+  "Actions": [
+    "Microsoft.Resources/subscriptions/resourceGroups/read",
+    "Microsoft.Resources/subscriptions/resourceGroups/resources/read"
+  ],
+  "NotActions": [],
+  "AssignableScopes": [
+    "/subscriptions/bf75502e-bab2-4709-9623-046fbddb39b7/resourceGroups/rs-developers"
+  ]
+}
