@@ -5,8 +5,8 @@ RESOURCE_GROUP="StanislavKostenich"
 COSMOS_ACCOUNT="devcosmosdbaccount20250125"
 DATABASE_NAME="Items"
 CONTAINER_NAME="Items"
-PRIMARY_REGION="westcentralus"
-SECONDARY_REGION="westus3"
+PRIMARY_REGION="westus3"
+SECONDARY_REGION="eastus"
 
 # Fetch Cosmos DB Account details
 COSMOS_ENDPOINT=$(az cosmosdb show --name $COSMOS_ACCOUNT --resource-group $RESOURCE_GROUP --query "documentEndpoint" -o tsv)
@@ -70,6 +70,12 @@ sleep 60
 echo "🔄 Verifying Data Consistency Post-Failover..."
 python3 <<EOF
 from azure.cosmos import CosmosClient
+
+# Cosmos DB credentials
+ENDPOINT = "$COSMOS_ENDPOINT"
+KEY = "$COSMOS_KEY"
+DATABASE_NAME = "$DATABASE_NAME"
+CONTAINER_NAME = "$CONTAINER_NAME"
 
 # Reconnect after failover
 client = CosmosClient(ENDPOINT, KEY)
