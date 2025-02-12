@@ -1,0 +1,18 @@
+2025-02-12 20:42:41 - Starting Terraform backend setup...
+2025-02-12 20:42:41 - Creating resource group: terraform-rg-dev2025
+Location    Name
+----------  --------------------
+eastus      terraform-rg-dev2025
+2025-02-12 20:42:45 - Creating storage account: tfstatestorage12345dev
+AccessTier    AllowBlobPublicAccess    AllowCrossTenantReplication    CreationTime                      EnableHttpsTrafficOnly    Kind       Location    MinimumTlsVersion    Name                    PrimaryLocation    ProvisioningState    ResourceGroup         StatusOfPrimary
+------------  -----------------------  -----------------------------  --------------------------------  ------------------------  ---------  ----------  -------------------  ----------------------  -----------------  -------------------  --------------------  -----------------
+Hot           False                    False                          2025-02-12T20:42:48.097642+00:00  True                      StorageV2  eastus      TLS1_0               tfstatestorage12345dev  eastus             Succeeded            terraform-rg-dev2025  available
+2025-02-12 20:43:07 - Creating storage container: tfstate-container
+Created
+---------
+True
+CreatedOn                         Name                                  PrincipalId                           PrincipalType    ResourceGroup         RoleDefinitionId                                                                                                                            Scope                                                                                                                                                       UpdatedBy                             UpdatedOn
+--------------------------------  ------------------------------------  ------------------------------------  ---------------  --------------------  ------------------------------------------------------------------------------------------------------------------------------------------  ----------------------------------------------------------------------------------------------------------------------------------------------------------  ------------------------------------  --------------------------------
+2025-02-12T20:43:28.130655+00:00  914f5f18-4d29-46ba-902a-66432df7593c  a6ef082c-f2ff-44cb-88d6-57ead467d75e  User             terraform-rg-dev2025  /subscriptions/9a6ae428-d8c3-44fe-bdf2-4e08593901a0/providers/Microsoft.Authorization/roleDefinitions/ba92f5b4-2d11-453d-a403-e96b0029c9fe  /subscriptions/9a6ae428-d8c3-44fe-bdf2-4e08593901a0/resourceGroups/terraform-rg-dev2025/providers/Microsoft.Storage/storageAccounts/tfstatestorage12345dev  a6ef082c-f2ff-44cb-88d6-57ead467d75e  2025-02-12T20:43:28.555666+00:00
+2025-02-12 20:43:31 - Verifying storage container contents...
+2025-02-12 20:43:31 - Terraform backend setup completed successfully!
