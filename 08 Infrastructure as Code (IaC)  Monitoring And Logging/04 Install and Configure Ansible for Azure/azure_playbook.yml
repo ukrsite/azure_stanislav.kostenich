@@ -1,0 +1,13 @@
+---
+- name: Retrieve Azure resource groups
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: List all resource groups
+      azure.azcollection.azure_rm_resourcegroup_info:
+      register: result
+
+    - name: Print the result
+      debug:
+        var: result
+
