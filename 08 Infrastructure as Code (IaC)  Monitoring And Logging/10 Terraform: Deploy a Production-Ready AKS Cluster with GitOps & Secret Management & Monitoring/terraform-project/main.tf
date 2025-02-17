@@ -17,7 +17,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
   location            = var.location
   resource_group_name = var.resource_group_name
   dns_prefix          = var.dns_prefix
-
+  azure_policy_enabled = true
+  
   default_node_pool {
     name       = "system"
     node_count = var.node_count
