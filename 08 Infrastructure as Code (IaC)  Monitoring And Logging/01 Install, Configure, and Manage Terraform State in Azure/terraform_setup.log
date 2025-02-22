@@ -1,0 +1,29 @@
+2025-02-11 20:20:52 - Starting Terraform backend setup...
+2025-02-11 20:20:52 - Creating resource group: terraform-rg-dev2025
+Location    Name
+----------  --------------------
+eastus      terraform-rg-dev2025
+2025-02-11 20:20:55 - Creating storage account: tfstatestorage12345dev
+AccessTier    AllowBlobPublicAccess    AllowCrossTenantReplication    CreationTime                      EnableHttpsTrafficOnly    Kind       Location    MinimumTlsVersion    Name                    PrimaryLocation    ProvisioningState    ResourceGroup         StatusOfPrimary
+------------  -----------------------  -----------------------------  --------------------------------  ------------------------  ---------  ----------  -------------------  ----------------------  -----------------  -------------------  --------------------  -----------------
+Hot           False                    False                          2025-02-11T20:20:58.402380+00:00  True                      StorageV2  eastus      TLS1_0               tfstatestorage12345dev  eastus             Succeeded            terraform-rg-dev2025  available
+2025-02-11 20:21:19 - Creating storage container: tfstate-container
+Created
+---------
+True
+2025-02-11 20:21:27 - Verifying storage container contents...
+2025-02-12 13:27:10 - Starting Terraform backend setup...
+2025-02-12 13:27:10 - Creating resource group: terraform-rg-dev2025
+Location    Name
+----------  --------------------
+eastus      terraform-rg-dev2025
+2025-02-12 13:27:12 - Creating storage account: tfstatestorage12345dev
+AccessTier    AllowBlobPublicAccess    AllowCrossTenantReplication    CreationTime                      EnableHttpsTrafficOnly    Kind       Location    MinimumTlsVersion    Name                    PrimaryLocation    ProvisioningState    ResourceGroup         StatusOfPrimary
+------------  -----------------------  -----------------------------  --------------------------------  ------------------------  ---------  ----------  -------------------  ----------------------  -----------------  -------------------  --------------------  -----------------
+Hot           False                    False                          2025-02-12T13:27:15.367875+00:00  True                      StorageV2  eastus      TLS1_0               tfstatestorage12345dev  eastus             Succeeded            terraform-rg-dev2025  available
+2025-02-12 13:27:35 - Creating storage container: tfstate-container
+Created
+---------
+True
+2025-02-12 13:27:40 - Verifying storage container contents...
+2025-02-12 13:27:40 - Terraform backend setup completed successfully!

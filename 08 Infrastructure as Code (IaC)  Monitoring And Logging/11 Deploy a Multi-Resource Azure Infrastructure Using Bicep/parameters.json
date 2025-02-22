@@ -1,0 +1,12 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "adminUsername": {
+        "value": "azureadmin"
+      },
+      "adminPublicKey": {
+        "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCusb1EAXEgicmlegY2VoqnbdZEUEW6wuW+aBkuRSQZp2qWwwQ1tHkTPc3QxHUaQ2dJ0ZmAYpZmTVVlvdO4ZccNq+ZsJQdWwikmWY55GzIlWmuuaVhIFtFsJxCpXE+YS+7beBA8ko2IkmdzoQygJb1zWC1jmh/3cp0TLGy41Pi4AkuYaZAebXrVkikBzVsqhqlSKVMSlqEcjvdPOUOnU8TgeuopvX+Ec3et09XGyTFw37eAXgVG3HcTUcfa7pYCsnDBrRv3VQx9cRhXxg6283Ty9QCEeIfcQ05nq0/JoD5AMo1ExwFiYlw9pWsuFPQGcGmDpLF8yCNO3dlnyBuwBvRNxjwXoa8Ka41qunO1+9VR6CkEn8ZdxO2wjTA+Gaf2FkptJprTy0IaMI1CiFJX8DdZeR1wJ9Pcedc82/CMDNZXm9UZZT5vNAnIX8sXLX68Oo+niB3CXRb6YuU1kkEH53NcpwV5pFYKmPg6DcDSESwVyHlOpDCq53jDB89IHMEmCj2bOg0MZQHL3cP3o2Re8MPWwyP/R4ZCEzWOSFKGcmbnxIbx1x8qnLk6LNYJixaCrReLL8dezjRsKIIbKAolBhgBbox+bU8dn6j+5Ts4bILp9PAL06rPhyZONkXrmPCgiMWLHiZ6QOx3T4coShuH+Y0g0uwadiPC2AycWJIm+9vZlQ== ukrsite@ukr.net"
+      }
+    }
+  }

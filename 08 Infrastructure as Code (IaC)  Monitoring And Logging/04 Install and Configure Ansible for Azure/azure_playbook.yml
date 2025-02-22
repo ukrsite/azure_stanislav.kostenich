@@ -1,0 +1,11 @@
+---
+- name: List Azure Resource Groups
+  hosts: localhost
+  tasks:
+    - name: Get resource groups
+      azure.azcollection.azure_rm_resourcegroup_info:
+      register: result
+
+    - name: Print resource groups
+      debug:
+        var: result

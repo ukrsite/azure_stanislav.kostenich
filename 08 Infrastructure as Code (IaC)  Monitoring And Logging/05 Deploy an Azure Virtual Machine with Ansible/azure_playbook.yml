@@ -1,0 +1,110 @@
+- name: Deploy Azure Resources
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+    - azure_credentials.yml
+
+  tasks:
+    - name: Create Resource Group
+      azure.azcollection.azure_rm_resourcegroup:
+        name: ansible-rg
+        location: eastus
+        client_id: "{{ azure_client_id }}"
+        secret: "{{ azure_secret }}"
+        tenant: "{{ azure_tenant }}"
+        subscription_id: "{{ azure_subscription_id }}"
+
+    - name: Create Virtual Network
+      azure.azcollection.azure_rm_virtualnetwork:
+        resource_group: ansible-rg
+        name: ansible-vnet
+        address_prefixes: "10.0.0.0/16"
+
+    - name: Create Subnet
+      azure.azcollection.azure_rm_subnet:
+        resource_group: ansible-rg
+        name: ansible-subnet
+        virtual_network: ansible-vnet
+        address_prefix: "10.0.1.0/24"
+
+    - name: Create Network Security Group
+      azure.azcollection.azure_rm_securitygroup:
+        resource_group: ansible-rg
+        name: ansible-nsg
+        rules:
+          - name: SSH
+            protocol: Tcp
+            direction: Inbound
+            access: Allow
+            priority: 1000
+            source_address_prefix: "172.172.187.41"
+            destination_port_range: 22
+          - name: HTTP
+            protocol: Tcp
+            direction: Inbound
+            access: Allow
+            priority: 1001
+            source_address_prefix: "*"
+            destination_port_range: 80
+
+    - name: Create Public IP
+      azure.azcollection.azure_rm_publicip:
+        resource_group: ansible-rg
+        name: ansible-pub-ip
+        allocation_method: Static
+      register: public_ip_output
+
+
+    - name: Create Network Interface
+      azure.azcollection.azure_rm_networkinterface:
+        resource_group: ansible-rg
+        name: ansible-nic
+        virtual_network: ansible-vnet
+        subnet: ansible-subnet
+        security_group: ansible-nsg
+                ip_configurations:
+          - name: ipconfig1
+            public_ip_name: ansible-pub-ip
+
+    - name: Deploy Virtual Machine
+      azure.azcollection.azure_rm_virtualmachine:
+        resource_group: ansible-rg
+        name: ansible-vm
+        vm_size: Standard_B1s
+        admin_username: azureuser
+        ssh_password_enabled: false
+        ssh_public_keys:
+          - path: /home/azureuser/.ssh/authorized_keys
+            key_data: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+        network_interfaces: ansible-nic
+        image:
+          offer: UbuntuServer
+          publisher: Canonical
+          sku: "18.04-LTS"
+          version: latest
+      register: vm_output
+
+    - name: Update Inventory with Public IP
+      copy:
+        dest: "./inventory.yml"
+        content: |
+          all:
+            hosts:
+              azure_vm:
+                ansible_host: "{{ public_ip_output.state.ip_address }}"
+                ansible_user: azureuser
+                ansible_ssh_private_key_file: ~/.ssh/id_rsa
+            vars:
+              ansible_connection: ssh
+              ansible_python_interpreter: /usr/bin/python3
+
+    - name: Set Public IP as a fact
+      set_fact:
+        public_ip: "{{ public_ip_output.state.ip_address }}"
+
+- name: Configure Web Server
+  hosts: azure_vm
+  become: yes
+  roles:
+    - nginx
