@@ -49,12 +49,5 @@ log "Verifying storage container contents..."
 log "Creating service principal"
 az ad sp create-for-rbac --name tfserviceprincipal --role Contributor --scopes /subscriptions/$SUBSCRIPTION_ID
 
-# {
-#   "appId": "0d9e6a34-4d15-4cec-85cf-8279f383fd06",
-#   "displayName": "tfserviceprincipal",
-#   "password": "D3z8Q~U~YvsXeOFaoyVSxvVYFVDMj-kZ2h4XKcGl",
-#   "tenant": "8d1157bb-1f96-415f-824b-ab0a29485d7d"
-# }
-
 log "Terraform backend setup completed successfully!"
 
