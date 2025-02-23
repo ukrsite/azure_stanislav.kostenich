@@ -1,0 +1,158 @@
+trigger:
+- main
+
+pool:
+  name: devLinux
+  demands:
+    - agent.name -equals myAgent
+
+variables:
+  - group: "Dev"  
+
+stages:
+- stage: Plan
+  displayName: 'Terraform Plan'
+  jobs:
+  - job: TerraformPlan
+    displayName: 'Terraform Plan'
+    steps:
+    # Install unzip if not present
+    - script: |
+        sudo apt-get update && sudo apt-get install -y unzip
+      displayName: 'Install unzip'
+      workingDirectory: $(System.DefaultWorkingDirectory)
+
+    # Install Terraform using a script step
+    - script: |
+        #!/bin/bash
+        set -euo pipefail
+        TERRAFORM_VERSION="1.7.5"
+        echo "Downloading Terraform version ${TERRAFORM_VERSION}..."
+        curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -o terraform.zip
+        unzip terraform.zip
+        sudo mv terraform /usr/local/bin/
+        rm terraform.zip
+        terraform version
+
+        
+      displayName: 'Install Terraform'
+      workingDirectory: $(System.DefaultWorkingDirectory)
+
+    - script: |
+        echo "Client ID: $(client_id)"
+        echo "Subscription ID: $(subscription_id)"
+      displayName: 'Check Variables'
+    # Login 
+    - script: |
+        az login --service-principal -u $(client_id) -p $(client_secret) --tenant $(tenant_id)
+        az account set --subscription $(subscription_id)
+      displayName: 'Azure CLI Login'
+    # Initialize Terraform with backend config override
+    - script: |
+        - script: |
+            terraform init \
+              -backend-config="storage_account_name=$(storageAccountName)" \
+              -backend-config="client_id=$(client_id)" \
+              -backend-config="client_secret=$(client_secret)" \
+              -backend-config="tenant_id=$(tenant_id)" \
+              -backend-config="subscription_id=$(subscription_id)"
+      displayName: 'Terraform Init with Authentication'
+        #terraform state rm module.network.azurerm_resource_group.rg #remove from state file
+        #terraform force-unlock -force ec22c6a3-2aa9-f8f9-5577-dce61fc5bf49 # forse state unlock 
+      workingDirectory: $(System.DefaultWorkingDirectory)
+    # Initialize Terraform with backend config override
+    # terraform state rm module.network.azurerm_resource_group.r
+    - script: |
+        echo "fromstate rm can be here"
+      #remove from state file
+      # forse state unlock 
+      displayName: 'Terraform remove item'
+      workingDirectory: $(System.DefaultWorkingDirectory)
+    # Run Terraform plan and output the plan file
+    - script: |
+        echo "SQL Admin Password: $(sql_admin_password)"
+      env:
+        SQL_ADMIN_PASSWORD: $(sql_admin_password) # Pass the variable as an environment variable
+    - script: |
+        echo "##vso[task.setvariable variable=TF_VAR_sql_admin_password]$(sql_admin_password)"
+    - script: |
+        terraform plan -out=tfplan
+      displayName: 'Terraform Plan'
+      workingDirectory: $(System.DefaultWorkingDirectory)
+
+    # List files to verify the tfplan exists
+    - script: |
+        ls -al $(System.DefaultWorkingDirectory)
+      displayName: 'Verify tfplan exists'
+      workingDirectory: $(System.DefaultWorkingDirectory)
+
+    # Publish the tfplan artifact for use in the Deploy stage
+    - publish: $(System.DefaultWorkingDirectory)/tfplan
+      artifact: tfplan
+      displayName: 'Publish tfplan artifact'
+
+- stage: Deploy
+  displayName: 'Terraform Apply'
+  dependsOn: Plan
+  condition: succeeded()
+  jobs:
+  - job: TerraformApply
+    displayName: 'Terraform Apply'
+    steps:
+    # Install unzip on the deploy agent
+    - script: |
+        sudo apt-get update && sudo apt-get install -y unzip
+      displayName: 'Install unzip'
+      workingDirectory: $(System.DefaultWorkingDirectory)
+
+    # Re-install Terraform on the deploy agent
+    - script: |
+        #!/bin/bash
+        set -euo pipefail
+        TERRAFORM_VERSION="1.7.5" 
+        echo "Downloading Terraform version ${TERRAFORM_VERSION}..."
+        curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -o terraform.zip
+        unzip terraform.zip
+        sudo mv terraform /usr/local/bin/
+        rm terraform.zip
+        terraform version
+      displayName: 'Install Terraform'
+      workingDirectory: $(System.DefaultWorkingDirectory)
+
+    # Download the tfplan artifact from the Plan stage
+    - download: current
+      artifact: tfplan
+      displayName: 'Download tfplan artifact'
+
+    # Verify downloaded artifact location
+    - script: |
+        ls -al $(Pipeline.Workspace)/tfplan
+      displayName: 'Verify downloaded tfplan'
+
+    # Login 
+    - script: |
+        az login --service-principal -u $(client_id) -p $(client_secret) --tenant $(tenant_id)
+        az account set --subscription $(subscription_id)
+      displayName: 'Azure CLI Login'
+    # Reinitialize Terraform with the same backend override
+    - script: |
+        echo "SQL Admin Password: $(sql_admin_password)"
+      env:
+        SQL_ADMIN_PASSWORD: $(sql_admin_password) # Pass the variable as an environment variable
+    - script: |
+        echo "##vso[task.setvariable variable=TF_VAR_sql_admin_password]$(sql_admin_password)"
+    - script: |
+        terraform init \
+          -backend-config="storage_account_name=$(storageAccountName)" \
+          -backend-config="client_id=$(client_id)" \
+          -backend-config="client_secret=$(client_secret)" \
+          -backend-config="tenant_id=$(tenant_id)" \
+          -backend-config="subscription_id=$(subscription_id)"
+      displayName: 'Terraform Init with Lockfile'
+      workingDirectory: $(System.DefaultWorkingDirectory)
+
+    # Apply the saved Terraform plan
+    - script: |
+        terraform apply -auto-approve $(Pipeline.Workspace)/tfplan/tfplan
+      displayName: 'Terraform Apply'
+      workingDirectory: $(System.DefaultWorkingDirectory)
